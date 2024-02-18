@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 var apikey = builder.Configuration["BotConfiguration:BotToken"];
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHostedService<InitService>();
 builder.Services.AddHttpClient("telegram_bot_client")
         .AddTypedClient<ITelegramBotClient>((httpClient, sp) =>
         {
@@ -14,11 +15,12 @@ builder.Services.AddHttpClient("telegram_bot_client")
             return new TelegramBotClient(options, httpClient);
         });
 
-builder.Services.AddScoped(x =>
+builder.Services.AddSingleton(x =>
 {
     string SavePath = Environment.CurrentDirectory + "/Repositories/RssFeed.db";
     return new SqliteConnection($"Data Source={SavePath}");
-}); 
+});
+
 builder.Services.AddScoped<RssService>();
 builder.Services.AddScoped<UpdateHandler>();
 builder.Services.AddScoped<ReceiverService>();

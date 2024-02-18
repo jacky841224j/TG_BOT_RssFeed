@@ -1,8 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Logging;
 using Quartz;
-using System.Drawing;
 using System.ServiceModel.Syndication;
 using System.Xml;
 using Telegram.Bot;
@@ -18,7 +16,6 @@ namespace TGBot_RssFeed_Polling.Services
         private readonly ILogger<Schedule> _logger;
         private readonly SqliteConnection _sqlcon;
         private ITelegramBotClient botClient;
-        private readonly string SavePath = Environment.CurrentDirectory + "/Repositories/RssFeed.db";
         TimeZoneInfo targetTimeZone;
 
         public Schedule(ITelegramBotClient botClient, SqliteConnection sqlcon, ILogger<Schedule> logger)
@@ -27,8 +24,6 @@ namespace TGBot_RssFeed_Polling.Services
             _sqlcon = sqlcon;
             _logger = logger;
             targetTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
-            //判斷DB是否存在
-            CreateDatabaseFile();
         }
         public async Task Execute(IJobExecutionContext context)
         {
@@ -90,55 +85,5 @@ namespace TGBot_RssFeed_Polling.Services
             }
             return;
         }
-
-        /// <summary>
-        /// 判斷DB是否存在
-        /// </summary>
-        private async void CreateDatabaseFile()
-        {
-            
-            if (!Directory.Exists(Environment.CurrentDirectory + "/Repositories"))
-            {
-                _logger.LogInformation("建立資料夾...");
-                Directory.CreateDirectory(Environment.CurrentDirectory + "/Repositories");
-            }
-
-            if (!File.Exists(SavePath))
-            {
-                using (_sqlcon)
-                {
-                    await _sqlcon.OpenAsync();
-                    _ = await _sqlcon.ExecuteAsync(
-                        @"CREATE TABLE User (
-                       ID INTEGER ,
-                       UserID  TEXT NOT NULL UNIQUE,
-                       PRIMARY KEY(ID AUTOINCREMENT)
-                    );"
-                    );
-
-                    _ = await _sqlcon.ExecuteAsync(
-                        @"CREATE TABLE Sub (
-                       ID INTEGER ,
-                       Num INTEGER ,
-                       UserID  TEXT NOT NULL ,
-                       SubTitle  TEXT ,
-                       SubUrl  TEXT NOT NULL UNIQUE,
-                       PRIMARY KEY(ID AUTOINCREMENT)
-                    );"
-                    );
-
-                    _ = await _sqlcon.ExecuteAsync(
-                        @"CREATE TABLE Time (
-                        ID INTEGER ,
-                        UpdateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        PRIMARY KEY(ID AUTOINCREMENT)
-                    );"
-                    );
-
-                    _ = await _sqlcon.ExecuteAsync(@"INSERT INTO Time (UpdateTime) values (@Time)", new { Time = TimeZoneInfo.ConvertTime(DateTime.Now, targetTimeZone) });
-                }
-            }
-        }
-
     }
 }
