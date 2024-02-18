@@ -24,6 +24,6 @@ RUN dotnet publish "TGBot_RssFeed_Polling.csproj" -c Release -o /app/publish /p:
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-#RUN mkdir /app/Repositories
+RUN mkdir /app/Repositories
 
 CMD ASPNETCORE_URLS=http://*:$PORT dotnet TGBot_RssFeed_Polling.dll
