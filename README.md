@@ -14,17 +14,7 @@ https://t.me/Tian_RSS_bot
 
 二、使用Docker執行
 
-1-1.直接從Docker Hub 抓取 
-```cmd
-docker pull jacky841224j/tgbot_rssfeed_polling:latest
-
-```
-1-2.Docker執行
-```cmd
-docker run jacky841224j/tgbot_rssfeed_polling:latest
-```
-
-2.將程式pull下來後打包成Docker使用
+1.將程式pull下來後打包成Docker使用
 ```cmd
 docker build -t 名稱 . --no-cache
 ```
