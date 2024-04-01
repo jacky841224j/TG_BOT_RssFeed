@@ -46,7 +46,7 @@ namespace TGBot_RssFeed_Polling.Services
                     }
 
                     //搜尋訂閱數目
-                    var User = await _sqlcon.QueryAsync<User>("SELECT * FROM Sub WHERE UserID = @UserID", new { UserID = id, });
+                    var User = await _sqlcon.QueryAsync<Subscription>("SELECT * FROM Sub WHERE UserID = @UserID", new { UserID = id, });
                     var count = User.Count();
 
                     var exits = User.Where(x => x.SubUrl == url).Any();
