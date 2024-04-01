@@ -46,8 +46,12 @@ namespace TGBot_RssFeed_Polling.Services
                     }
 
                     //搜尋訂閱數目
-                    var Count = await _sqlcon.QueryFirstOrDefaultAsync<int>("SELECT Count(Num) FROM Sub WHERE UserID = @UserID", new { UserID = id, });
+                    var User = await _sqlcon.QueryAsync<User>("SELECT * FROM Sub WHERE UserID = @UserID", new { UserID = id, });
+                    var count = User.Count();
 
+                    var exits = User.Where(x => x.SubUrl == url).Any();
+                    if (exits) throw new Exception("訂閱網址已存在");
+                    
                     _logger.LogInformation("解析RSS...");
                     XmlReader reader = XmlReader.Create(url);
                     SyndicationFeed feed = SyndicationFeed.Load(reader);
@@ -55,7 +59,7 @@ namespace TGBot_RssFeed_Polling.Services
 
                     _logger.LogInformation("新增RSS...");
                     //新增資料
-                    _ = await _sqlcon.ExecuteAsync("INSERT INTO Sub (UserID,Num,SubTitle,SubUrl) values (@UserID,@Num,@SubTitle,@SubUrl)", new { UserID = id, Num = Count + 1, SubTitle, SubUrl = url });
+                    _ = await _sqlcon.ExecuteAsync("INSERT INTO Sub (UserID,Num,SubTitle,SubUrl) values (@UserID,@Num,@SubTitle,@SubUrl)", new { UserID = id, Num = count + 1, SubTitle, SubUrl = url });
                 }
 
                 _logger.LogInformation("RSS新增成功...");

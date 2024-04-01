@@ -42,7 +42,7 @@ namespace TGBot_RssFeed_Polling.Services
                        Num INTEGER ,
                        UserID  TEXT NOT NULL ,
                        SubTitle  TEXT ,
-                       SubUrl  TEXT NOT NULL UNIQUE,
+                       SubUrl  TEXT NOT NULL ,
                        PRIMARY KEY(ID AUTOINCREMENT)
                     );"
                     );
